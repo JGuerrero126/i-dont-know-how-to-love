@@ -1,35 +1,35 @@
 function love.load()
-    x = 100
-    y = 50
-    move = true
+    listOfRectangles = {}
 end
 
 function love.draw()
-    love.graphics.rectangle("line", x, y, 200, 150)
-end
-
-function love.update(dt)
-    if love.keyboard.isDown("right") then
-        print("moving right!")
-        x = x + 100 * dt
-    elseif love.keyboard.isDown("left") then
-        print("moving left!")
-        x = x - 100 * dt
-    elseif love.keyboard.isDown("up") then
-        print("moving up!")
-        y = y - 100 * dt
-    elseif love.keyboard.isDown("down") then
-        print("moving down!")
-        y = y + 100 * dt
+    for i,v in ipairs(listOfRectangles) do
+        love.graphics.rectangle("line", v.x, v.y, v.width, v.height)
     end
 end
 
-if 5 < 9 and 14 > 7 then
-    print("Both statements are true")
+function love.update(dt)
+    for i,v in ipairs(listOfRectangles) do
+        v.x = v.x + v.speed * dt
+    end
 end
 
-if 20 < 9 or 14 > 7 or 5 == 10 then
-    print("One of these staements is true")
+function creatRect()
+    rect = {}
+    rect.x = 100
+    rect.y = 100
+    rect.width = 70
+    rect.height = 90
+    rect.speed = 100
+
+    table.insert(listOfRectangles, rect)
+end
+
+function love.keypressed(key)
+    if key == "space" then
+        creatRect()
+    end
+    
 end
 
 if arg[2] == "debug" then
