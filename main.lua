@@ -1,33 +1,16 @@
 function love.load()
-    listOfRectangles = {}
+  x = 30
+  y = 50
 end
 
 function love.draw()
-    for i,v in ipairs(listOfRectangles) do
-        love.graphics.rectangle("line", v.x, v.y, v.width, v.height)
-    end
-end
-
-function love.update(dt)
-    for i,v in ipairs(listOfRectangles) do
-        v.x = v.x + v.speed * dt
-    end
-end
-
-function creatRect()
-    rect = {}
-    rect.x = 100
-    rect.y = 100
-    rect.width = 70
-    rect.height = 90
-    rect.speed = 100
-
-    table.insert(listOfRectangles, rect)
+    love.graphics.rectangle("line", x, y, 300, 200)
 end
 
 function love.keypressed(key)
     if key == "space" then
-        creatRect()
+        x = math.random(100, 500)
+        y = math.random(100, 500)
     end
     
 end
