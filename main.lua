@@ -1,10 +1,21 @@
+local r1, r2
+
 function love.load()
-  x = 30
-  y = 50
+ local Rectangle = require "rectangle"
+ local Circle = require "circle"
+
+ r1 = Rectangle(100, 100, 200, 50)
+ r2 = Circle(350, 80, 40)
+end
+
+function love.update(dt)
+    r1:update(dt)
+    r2:update(dt)
 end
 
 function love.draw()
-    love.graphics.rectangle("line", x, y, 300, 200)
+    r1:draw()
+    r2:draw()
 end
 
 function love.keypressed(key)
