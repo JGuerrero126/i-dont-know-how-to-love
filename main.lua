@@ -1,50 +1,39 @@
 function love.load()
-    r1 = {
-        x = 10,
-        y = 100,
-        width = 100,
-        height = 100
-    }
+    Object = require "classic"
+    require "player"
+    require "enemy"
+    require "bullet"
 
-    r2 = {
-        x = 250,
-        y = 120,
-        width = 150,
-        height = 120
-    }
+    player = Player()
+    enemy = Enemy()
+    listOfBullets = {}
 end
 
 function love.update(dt)
-    r1.x = r1.x + 100 * dt
+    player:update(dt)
+    enemy:update(dt)
+
+    for i,v in ipairs(listOfBullets) do
+        v:update(dt)
+        v:checkCollision(enemy)
+
+        if v.dead then
+            table.remove(listOfBullets, i)
+        end
+    end
 end
 
 function love.draw()
+    player:draw()
+    enemy:draw()
 
-    local mode
-    if checkCollision(r1,r2) then
-        mode = "fill"
-    else
-        mode = "line"
+    for i,v in ipairs(listOfBullets) do
+        v:draw()
     end
-    love.graphics.rectangle(mode, r1.x, r1.y, r1.width, r1.height)
-    love.graphics.rectangle(mode, r2.x, r2.y, r2.width, r2.height)
 end
 
-function checkCollision(a, b)
-    local a_left = a.x
-    local a_right = a.x + a.width
-    local a_top = a.y
-    local a_bottom = a.y + a.height
-
-    local b_left = b.x
-    local b_right = b.x + b.width
-    local b_top = b.y
-    local b_bottom = b.y + b.height
-
-    return a_right > b_left
-    and a_left < b_right
-    and a_bottom > b_top
-    and a_top < b_bottom
+function love.keypressed(key)
+    player:keyPressed(key)
 end
 
 if arg[2] == "debug" then
