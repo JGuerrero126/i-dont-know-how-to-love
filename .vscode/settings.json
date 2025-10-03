@@ -5,6 +5,6 @@
     "**/*.rpymc": true,
     "**/cache/": true
   },
-  "Lua.diagnostics.globals": ["love", "lldebugger"],
-  "Lua.diagnostics.disable": ["lowercase-global"]
+  "Lua.diagnostics.globals": ["love", "lldebugger", "Object"],
+  "Lua.diagnostics.disable": ["lowercase-global", "duplicate-set-field"]
 }

@@ -1,39 +1,37 @@
 function love.load()
-    Object = require "classic"
-    require "player"
-    require "enemy"
-    require "bullet"
+    circle = {}
 
-    player = Player()
-    enemy = Enemy()
-    listOfBullets = {}
+    circle.x = 100
+    circle.y = 100
+    circle.radius = 25
+    circle.speed = 200
 end
 
 function love.update(dt)
-    player:update(dt)
-    enemy:update(dt)
+    mouse_x, mouse_y = love.mouse.getPosition()
 
-    for i,v in ipairs(listOfBullets) do
-        v:update(dt)
-        v:checkCollision(enemy)
+    angle = math.atan2(mouse_y - circle.y, mouse_x - circle.x)
 
-        if v.dead then
-            table.remove(listOfBullets, i)
-        end
-    end
+    cos = math.cos(angle)
+    sin = math.sin(angle)
+
+    circle.x = circle.x + circle.speed * cos * dt
+    circle.y = circle.y + circle.speed * sin * dt
 end
 
 function love.draw()
-    player:draw()
-    enemy:draw()
-
-    for i,v in ipairs(listOfBullets) do
-        v:draw()
-    end
+    love.graphics.circle("line", circle.x, circle.y, circle.radius)
+    love.graphics.line(circle.x, circle.y, mouse_x, mouse_y)
+    love.graphics.line(circle.x, circle.y, mouse_x, circle.y)
+    love.graphics.line(mouse_x, mouse_y, mouse_x, circle.y)
 end
 
-function love.keypressed(key)
-    player:keyPressed(key)
+function getDistance(x1, y1, x2, y2)
+    local horizontal_distance = x1 - x2
+    local vertical_distance = y1 - y2
+
+    local a = horizontal_distance ^2
+    local b = vertical_distance ^2
 end
 
 if arg[2] == "debug" then
