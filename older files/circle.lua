@@ -1,4 +1,4 @@
-local Shape = require "shape"
+local Shape = require "older files.shape"
 
 local Circle = Shape:extend()
 

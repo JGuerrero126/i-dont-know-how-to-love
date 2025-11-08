@@ -1,99 +1,107 @@
+lume = require "libraries.lume"
+
 function love.load()
-    song = love.audio.newSource("song.ogg", "stream")
-    song:setLooping(true)
-    song:play()
+    player = {
+        x = 100,
+        y = 100,
+        size = 25,
+        image = love.graphics.newImage("images/face.png")
+    }
 
-    sfx = love.audio.newSource("sfx.ogg", "static")
+    coins = {}
 
-    image = love.graphics.newImage("tileset2.png")
+    if love.filesystem.getInfo("savedata.txt") then
+        file = love.filesystem.read("savedata.txt")
+        data = lume.deserialize(file)
 
-    local image_width = image:getWidth()
-    local image_height = image:getHeight()
+        player.x = data.player.x
+        player.y = data.player.y
+        player.size = data.player.size
 
-
-    width = 32
-    height = 32
-
-    quads = {}
-
-    for i=0,1 do
-        for j=0,3 do
-            table.insert(quads, love.graphics.newQuad(1 + j * (width + 2), 1 + i * (height + 2), width, height, image_width, image_height))
+        for index, value in ipairs(data.coins) do
+            coins[index] = {
+                x = value.x,
+                y = value.y,
+                size = 10,
+                image = love.graphics.newImage("images/dollar.png")
+            }
+        end
+    else
+        for i=1,25 do
+            table.insert(coins,
+                {
+                    x = love.math.random(50, 650),
+                    y = love.math.random(50, 450),
+                    size = 10,
+                    image = love.graphics.newImage("images/dollar.png")
+                }
+            )
         end
     end
-
-
-    tilemap = {
-        {1, 7, 7, 2, 1, 7, 7, 2, 7, 7, 2},
-        {3, 0, 0, 5, 6, 0, 0, 3, 0, 0, 3},
-        {3, 0, 0, 0, 0, 0, 0, 8, 0, 0, 3}, 
-        {5, 2, 0, 0, 0, 0, 1, 6, 0, 0, 3}, 
-        {1, 6, 0, 0, 0, 0, 5, 2, 0, 0, 3},
-        {3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3},
-        {3, 0, 0, 1, 2, 0, 4, 3, 0, 0, 3},
-        {5, 7, 7, 6, 5, 7, 7, 6, 7, 7, 6}
-    }
-
-    player = {
-        image = love.graphics.newImage("player.png"),
-        tile_x = 2,
-        tile_y = 2
-    }
-
-    key = love.graphics.newImage("key.png")
 end
 
 function love.update(dt)
- 
+   if love.keyboard.isDown("left") then
+        player.x = player.x - 200 * dt
+   elseif love.keyboard.isDown("right") then
+        player.x = player.x + 200 * dt
+   end
+
+   if love.keyboard.isDown("up") then
+        player.y = player.y - 200 * dt
+    elseif love.keyboard.isDown("down") then
+        player.y = player.y + 200 * dt
+   end
+
+   for i=#coins,1, -1 do
+        if checkCollision(player, coins[i]) then
+            table.remove(coins, i)
+            player.size = player.size + 1
+        end
+   end
 end
 
 function love.draw()
-    for i,row in ipairs(tilemap) do
-        for j,tile in ipairs(row) do
-            if tile ~= 0 then
-                love.graphics.draw(image, quads[tile], j * width, i * height)
-            end
-        end
+    love.graphics.circle("line", player.x, player.y, player.size)
+
+    love.graphics.draw(player.image, player.x, player.y, 0, 1, 1, player.image:getWidth()/2, player.image:getHeight()/2)
+
+    for i,v in ipairs(coins) do
+        love.graphics.circle("line", v.x, v.y, v.size)
+        love.graphics.draw(v.image, v.x, v.y, 0, 1, 1, v.image:getWidth()/2, v.image:getHeight()/2)
+    end
+end
+
+
+function checkCollision(p1, p2)
+    local distance = math.sqrt((p1.x - p2.x)^2 + (p1.y - p2.y)^2)
+    return distance < p1.size + p2.size
+end
+
+function saveGame()
+    data = {}
+    data.player = {
+        x = player.x,
+        y = player.y,
+        size = player.size
+    }
+
+    data.coins = {}
+    for i,v in ipairs(coins) do
+        data.coins[i] = {x = v.x, y = v.y}
     end
 
-    love.graphics.draw(player.image, player.tile_x * width, player.tile_y * height)
-
-    -- love.graphics.draw(key, 7 * width, 7 *height)
+    serialized = lume.serialize(data)
+    love.filesystem.write("savedata.txt", serialized)
 end
 
 function love.keypressed(key)
-    local x = player.tile_x
-    local y = player.tile_y
-
-    if key == "left" then
-        x = x - 1
-    elseif key == "right" then
-        x = x + 1
-    elseif key == "up" then
-        y = y - 1
-    elseif key == "down" then
-        y = y + 1
-    elseif key == "space" then
-        sfx:play()
+    if key == "f1" then
+        saveGame()
+    elseif key == "f2" then
+        love.filesystem.remove("savedata.txt")
+        love.event.quit("restart")
     end
-    
-    if isEmpty(x, y) or tilemap[y][x] == 4 then
-        player.tile_x = x
-        player.tile_y = y 
-    end
-
-    if gotKey(x, y) then
-        tilemap[y][x] = 0
-        tilemap[3][8] = 0
-    end
-end
-
-function isEmpty(x, y)
-    return tilemap[y][x] == 0
-end
-
-function gotKey(x, y)
-    return  tilemap[y][x] == 4
 end
 
 if arg[2] == "debug" then

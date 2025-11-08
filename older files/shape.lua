@@ -1,4 +1,4 @@
-local Object = require "classic"
+local Object = require "libraries.classic"
 
 local Shape = Object:extend()
 

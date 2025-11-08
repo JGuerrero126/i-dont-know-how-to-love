@@ -1,5 +1,5 @@
 --! file: rectangle.lua
-local Shape = require "shape"
+local Shape = require "older files.shape"
 -- Pass Object as first argument.
 local Rectangle = Shape:extend()
 
